@@ -13,17 +13,38 @@ export default function AdminLoginPage() {
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const turnstileActive = TURNSTILE_ENABLED && Boolean(TURNSTILE_SITE_KEY);
 
   useEffect(() => {
-    if (!TURNSTILE_ENABLED || !TURNSTILE_SITE_KEY) return;
+    if (!turnstileActive || !TURNSTILE_SITE_KEY) return;
     (window as any).onTurnstileSuccess = (token: string) => {
       setTurnstileToken(token);
+      setError(null);
     };
-  }, []);
+    (window as any).onTurnstileExpired = () => {
+      setTurnstileToken(null);
+      setError("Please complete the security verification.");
+    };
+    (window as any).onTurnstileError = () => {
+      setTurnstileToken(null);
+      setError("Security verification failed. Please try again.");
+    };
+    return () => {
+      delete (window as any).onTurnstileSuccess;
+      delete (window as any).onTurnstileExpired;
+      delete (window as any).onTurnstileError;
+    };
+  }, [turnstileActive]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (turnstileActive && !turnstileToken) {
+      setError("Please complete the security verification.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -79,11 +100,13 @@ export default function AdminLoginPage() {
             required
           />
         </div>
-        {TURNSTILE_ENABLED && TURNSTILE_SITE_KEY && (
+        {turnstileActive && TURNSTILE_SITE_KEY && (
           <div
             className="cf-turnstile mt-2"
             data-sitekey={TURNSTILE_SITE_KEY}
             data-callback="onTurnstileSuccess"
+            data-expired-callback="onTurnstileExpired"
+            data-error-callback="onTurnstileError"
           />
         )}
         {error && <p className="text-xs text-red-400">{error}</p>}
