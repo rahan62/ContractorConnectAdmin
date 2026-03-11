@@ -37,10 +37,10 @@ export function AdminSidebar() {
   const operator = useAdminOperator();
 
   useEffect(() => {
-    if (operator.ready && !operator.id) {
+    if (operator.ready && (!operator.id || !operator.token)) {
       router.replace("/login");
     }
-  }, [operator.ready, operator.id, router]);
+  }, [operator.ready, operator.id, operator.token, router]);
 
   function handleLogout() {
     clearAdminSession();
