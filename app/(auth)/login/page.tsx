@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
 import { setAdminSession } from "@/lib/adminApi";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
 
 const ADMIN_API_URL = process.env.NEXT_PUBLIC_ADMIN_API_URL || "http://localhost:4000";
 const TURNSTILE_ENABLED = process.env.NEXT_PUBLIC_ADMIN_TURNSTILE_ENABLED !== "false";
@@ -15,26 +16,20 @@ export default function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const turnstileActive = TURNSTILE_ENABLED && Boolean(TURNSTILE_SITE_KEY);
 
-  useEffect(() => {
-    if (!turnstileActive || !TURNSTILE_SITE_KEY) return;
-    (window as any).onTurnstileSuccess = (token: string) => {
-      setTurnstileToken(token);
-      setError(null);
-    };
-    (window as any).onTurnstileExpired = () => {
-      setTurnstileToken(null);
-      setError("Please complete the security verification.");
-    };
-    (window as any).onTurnstileError = () => {
-      setTurnstileToken(null);
-      setError("Security verification failed. Please try again.");
-    };
-    return () => {
-      delete (window as any).onTurnstileSuccess;
-      delete (window as any).onTurnstileExpired;
-      delete (window as any).onTurnstileError;
-    };
-  }, [turnstileActive]);
+  const handleTurnstileSuccess = useCallback((token: string) => {
+    setTurnstileToken(token);
+    setError(null);
+  }, []);
+
+  const handleTurnstileExpired = useCallback(() => {
+    setTurnstileToken(null);
+    setError("Please complete the security verification.");
+  }, []);
+
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileToken(null);
+    setError("Security verification failed. Please try again.");
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -101,12 +96,12 @@ export default function AdminLoginPage() {
           />
         </div>
         {turnstileActive && TURNSTILE_SITE_KEY && (
-          <div
-            className="cf-turnstile mt-2"
-            data-sitekey={TURNSTILE_SITE_KEY}
-            data-callback="onTurnstileSuccess"
-            data-expired-callback="onTurnstileExpired"
-            data-error-callback="onTurnstileError"
+          <TurnstileWidget
+            siteKey={TURNSTILE_SITE_KEY}
+            onSuccess={handleTurnstileSuccess}
+            onExpired={handleTurnstileExpired}
+            onError={handleTurnstileError}
+            className="mt-2 min-h-[65px]"
           />
         )}
         {error && <p className="text-xs text-red-400">{error}</p>}
