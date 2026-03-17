@@ -11,6 +11,10 @@ interface MonetizationData {
     featuredListingPrice: number;
     tokenUnitPrice: number;
     vatRate: number;
+    tokensPerContract: number;
+    tokensPerBid: number;
+    tokensPerAvailabilityPost: number;
+    tokensPerUrgentJob: number;
   };
   stats: {
     completedRevenue: number;
@@ -29,7 +33,11 @@ export default function MonetizationPage() {
     yearlySubscriptionPrice: "",
     featuredListingPrice: "",
     tokenUnitPrice: "",
-    vatRate: ""
+    vatRate: "",
+    tokensPerContract: "",
+    tokensPerBid: "",
+    tokensPerAvailabilityPost: "",
+    tokensPerUrgentJob: ""
   });
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +58,11 @@ export default function MonetizationPage() {
       yearlySubscriptionPrice: String(json.config.yearlySubscriptionPrice),
       featuredListingPrice: String(json.config.featuredListingPrice),
       tokenUnitPrice: String(json.config.tokenUnitPrice),
-      vatRate: String(json.config.vatRate)
+      vatRate: String(json.config.vatRate),
+      tokensPerContract: String(json.config.tokensPerContract),
+      tokensPerBid: String(json.config.tokensPerBid),
+      tokensPerAvailabilityPost: String(json.config.tokensPerAvailabilityPost),
+      tokensPerUrgentJob: String(json.config.tokensPerUrgentJob)
     });
     setLoading(false);
   }
@@ -67,7 +79,11 @@ export default function MonetizationPage() {
         yearlySubscriptionPrice: Number(form.yearlySubscriptionPrice),
         featuredListingPrice: Number(form.featuredListingPrice),
         tokenUnitPrice: Number(form.tokenUnitPrice),
-        vatRate: Number(form.vatRate)
+        vatRate: Number(form.vatRate),
+        tokensPerContract: Number(form.tokensPerContract),
+        tokensPerBid: Number(form.tokensPerBid),
+        tokensPerAvailabilityPost: Number(form.tokensPerAvailabilityPost),
+        tokensPerUrgentJob: Number(form.tokensPerUrgentJob)
       })
     });
     const json = await res.json().catch(() => ({}));
@@ -120,7 +136,11 @@ export default function MonetizationPage() {
                     ["yearlySubscriptionPrice", "Yearly subscription"],
                     ["featuredListingPrice", "Featured listing"],
                     ["tokenUnitPrice", "Token unit"],
-                    ["vatRate", "VAT rate"]
+                    ["vatRate", "VAT rate"],
+                    ["tokensPerContract", "Tokens per contract (contractor)"],
+                    ["tokensPerBid", "Tokens per bid (sub-contractor)"],
+                    ["tokensPerAvailabilityPost", "Tokens per availability post (team)"],
+                    ["tokensPerUrgentJob", "Tokens per urgent job (contractor)"]
                   ] as const
                 ).map(([key, label]) => (
                   <label key={key} className="block space-y-1 text-sm">
