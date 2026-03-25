@@ -61,8 +61,16 @@ export default function AdminLoginPage() {
       const data = await res.json();
       setAdminSession(data);
       window.location.href = "/dashboard";
-    } catch (err: any) {
-      setError(err.message ?? "Login failed");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Login failed";
+      // Browser often surfaces TLS/DNS issues as TypeError + "Failed to fetch" (see console for ERR_CERT_*).
+      if (message === "Failed to fetch" || message === "Load failed" || message === "NetworkError when attempting to fetch resource.") {
+        setError(
+          "Could not reach the admin API. Confirm NEXT_PUBLIC_ADMIN_API_URL is correct and HTTPS presents a certificate valid for that exact host (check DevTools → Network; fix ERR_CERT_* on the server or proxy)."
+        );
+      } else {
+        setError(message);
+      }
     } finally {
       setLoading(false);
     }
