@@ -13,6 +13,7 @@ import {
   Shield,
   UserPlus,
   BadgeDollarSign,
+  ClipboardCheck,
   LogOut
 } from "lucide-react";
 import { useAdminOperator } from "./useAdminOperator";
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/registrations", label: "Manual Registrations", icon: FileText },
   { href: "/contracts", label: "Contracts", icon: FileText },
   { href: "/complaints", label: "Complaints", icon: AlertCircle },
+  { href: "/category-experience", label: "Category experience requests", icon: ClipboardCheck },
   { href: "/payments", label: "Payments", icon: CreditCard },
   { href: "/teams", label: "Teams", icon: Users2 },
   { href: "/operators", label: "Operators", icon: UserPlus },
@@ -48,8 +50,8 @@ export function AdminSidebar() {
   }
 
   return (
-    <aside className="fixed inset-y-0 left-0 w-64 border-r border-slate-200 bg-white">
-      <div className="flex h-16 items-center gap-3 border-b border-slate-200 px-4">
+    <aside className="fixed inset-y-0 left-0 flex w-64 flex-col border-r border-slate-200 bg-white">
+      <div className="flex h-16 shrink-0 items-center gap-3 border-b border-slate-200 px-4">
         <div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-600 text-white text-xs font-bold">
           T
         </div>
@@ -58,7 +60,7 @@ export function AdminSidebar() {
           <span className="text-xs text-slate-500">Admin Panel</span>
         </div>
       </div>
-      <nav className="mt-4 space-y-1 px-2 text-sm">
+      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-4 text-sm">
         {navItems.map(item => {
           const Icon = item.icon;
           const active = pathname === item.href;
@@ -72,13 +74,13 @@ export function AdminSidebar() {
                   : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
-              <Icon className="h-4 w-4" />
-              <span>{item.label}</span>
+              <Icon className="h-4 w-4 shrink-0" />
+              <span className="leading-snug">{item.label}</span>
             </Link>
           );
         })}
       </nav>
-      <div className="absolute bottom-0 left-0 right-0 space-y-3 border-t border-slate-200 bg-slate-50 px-3 py-3 text-xs">
+      <div className="shrink-0 space-y-3 border-t border-slate-200 bg-slate-50 px-3 py-3 text-xs">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
             {(operator.name || operator.email || "?").charAt(0).toUpperCase()}

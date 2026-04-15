@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { useAdminOperator } from "@/components/useAdminOperator";
 import { adminFetch } from "@/lib/adminApi";
@@ -57,6 +58,26 @@ export default function DashboardPage() {
           <StatCard label="Open complaints" value={stats?.openComplaints} />
           <StatCard label="Contracts" value={stats?.contracts} />
           <StatCard label="Revenue" value={stats ? `${stats.revenue}` : undefined} />
+        </section>
+
+        <section className="mt-8">
+          <h2 className="mb-3 text-sm font-medium text-slate-700">Queues</h2>
+          <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="font-medium text-slate-900">Category experience approvals</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  Review trade-category evidence and approve or reject company requests.
+                </p>
+              </div>
+              <Link
+                href="/category-experience"
+                className="shrink-0 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              >
+                Open queue
+              </Link>
+            </div>
+          </div>
         </section>
       </main>
     </div>
