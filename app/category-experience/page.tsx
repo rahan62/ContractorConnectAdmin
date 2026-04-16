@@ -29,6 +29,7 @@ interface CategoryExperienceItem {
     name: string | null;
     email: string | null;
   } | null;
+  declaredEvidenceValueUsd?: string | number | null;
 }
 
 export default function CategoryExperienceAdminPage() {
@@ -37,6 +38,7 @@ export default function CategoryExperienceAdminPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const [evidenceUsd, setEvidenceUsd] = useState<Record<string, string>>({});
   const [actingId, setActingId] = useState<string | null>(null);
 
   async function load() {
@@ -61,9 +63,29 @@ export default function CategoryExperienceAdminPage() {
     setActingId(id);
     setMessage(null);
     const reviewerNote = notes[id]?.trim() || undefined;
+
+    const body: {
+      status: string;
+      reviewerNote?: string;
+      declaredEvidenceValueUsd?: number | null;
+    } = { status: nextStatus, reviewerNote };
+
+    if (nextStatus === "APPROVED") {
+      const raw = evidenceUsd[id]?.trim();
+      if (raw) {
+        const n = Number(raw);
+        if (!Number.isFinite(n) || n < 0) {
+          setActingId(null);
+          setMessage("Declared evidence (USD) must be a non-negative number.");
+          return;
+        }
+        body.declaredEvidenceValueUsd = n;
+      }
+    }
+
     const res = await adminFetch(`/api/admin/category-experience-requests/${id}`, {
       method: "PATCH",
-      body: JSON.stringify({ status: nextStatus, reviewerNote })
+      body: JSON.stringify(body)
     });
     const data = await res.json().catch(() => ({}));
     setActingId(null);
@@ -177,19 +199,40 @@ export default function CategoryExperienceAdminPage() {
 
                   {item.status === "PENDING" && (
                     <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:items-end">
-                      <div className="min-w-0 flex-1">
-                        <label className="block text-xs font-medium text-slate-600">Reviewer note (optional)</label>
-                        <textarea
-                          className="mt-1 w-full rounded border border-slate-300 px-2 py-1.5 text-sm"
-                          rows={2}
-                          value={notes[item.id] ?? ""}
-                          onChange={e =>
-                            setNotes(prev => ({
-                              ...prev,
-                              [item.id]: e.target.value
-                            }))
-                          }
-                        />
+                      <div className="min-w-0 flex-1 space-y-3">
+                        <div>
+                          <label className="block text-xs font-medium text-slate-600">Reviewer note (optional)</label>
+                          <textarea
+                            className="mt-1 w-full rounded border border-slate-300 px-2 py-1.5 text-sm"
+                            rows={2}
+                            value={notes[item.id] ?? ""}
+                            onChange={e =>
+                              setNotes(prev => ({
+                                ...prev,
+                                [item.id]: e.target.value
+                              }))
+                            }
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-slate-600">
+                            Declared job / evidence value (USD, optional — used for strength score)
+                          </label>
+                          <input
+                            type="number"
+                            min={0}
+                            step="0.01"
+                            placeholder="e.g. 1000000"
+                            className="mt-1 w-full max-w-xs rounded border border-slate-300 px-2 py-1.5 text-sm"
+                            value={evidenceUsd[item.id] ?? ""}
+                            onChange={e =>
+                              setEvidenceUsd(prev => ({
+                                ...prev,
+                                [item.id]: e.target.value
+                              }))
+                            }
+                          />
+                        </div>
                       </div>
                       <div className="flex gap-2">
                         <button

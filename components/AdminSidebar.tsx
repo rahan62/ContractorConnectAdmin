@@ -14,6 +14,7 @@ import {
   UserPlus,
   BadgeDollarSign,
   ClipboardCheck,
+  Award,
   LogOut
 } from "lucide-react";
 import { useAdminOperator } from "./useAdminOperator";
@@ -30,7 +31,8 @@ const navItems = [
   { href: "/teams", label: "Teams", icon: Users2 },
   { href: "/operators", label: "Operators", icon: UserPlus },
   { href: "/roles", label: "Roles & Permissions", icon: Shield },
-  { href: "/monetization", label: "Monetization", icon: BadgeDollarSign }
+  { href: "/monetization", label: "Monetization", icon: BadgeDollarSign },
+  { href: "/trust-strength", label: "Trust & strength", icon: Award }
 ];
 
 export function AdminSidebar() {
